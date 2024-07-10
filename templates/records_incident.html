@@ -1,0 +1,292 @@
+<head>
+    <title>CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        table {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .card {
+            background-color: white;
+            margin: 1em auto;
+            padding: 0.5em;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            text-align: center;
+        }
+        input[type="text"],
+        input[type="submit"] {
+            margin: 5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .section {
+            padding: 1.5rem;
+        }
+        .tab-content {
+            margin-left: 1rem;
+            margin-top: 2rem;
+        }
+        .tabs {
+            margin-bottom: 0.5rem;
+        }
+
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .navbar a {
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .navbar a.logo {
+
+            display: block;
+            color: #f2f2f2;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 30px;
+            padding: 14px 16px;
+        }
+
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .btn-group {
+            display: flex;
+        }
+        .is-table {
+            text-decoration: underline;
+        }
+        .table thead {
+            background-color: lightsteelblue;
+        }
+        .card {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="/home" class="logo">Crime Record Management</a>
+        <div class="nav-links">
+            <a href="/home" class="tablinks">Home</a>
+            <a href="/records/incident" class="tablinks">Records</a>
+            <a href="/search" class="tablinks">Search</a>
+            <a href="/report" class="tablinks">Report Crime</a>
+            <a href="/analytics" class="tablinks">Analytics</a>
+        </div>
+    </div>
+    <div id="Incident" class="tab-content" style="display: block;">
+        <h1>Incidents Records Data</h1>
+        <!-- <p>Below you see all the incidents recorded so far in USA. To report a new record please navigate to report
+            crime section.</section>
+        </p> -->
+        <!-- <div class="card">
+            <p class="mb-0">{{queries[0]}}</p>
+        </div> -->
+        <div class="btn-group m-1" role="group" aria-label="Choose table">
+            <button type="button" id="incident" class="btn btn-outline-primary is-table" onclick="window.location.href='/records/incident'">Incident</button>
+            <button type="button" id="victim" class="btn btn-outline-secondary" onclick="window.location.href='/records/victim'">Victim</button>
+            <button type="button" id="crimetype" class="btn btn-outline-success" onclick="window.location.href='/records/crimeType'">Crime Type</button>
+            <button type="button" id="premise" class="btn btn-outline-danger" onclick="window.location.href='/records/premise'">Premise</button>
+            <button type="button" id="status" class="btn btn-outline-warning" onclick="window.location.href='/records/status'">Status</button>
+        </div>
+        <div class="card p-0 mx-1">
+            <div class="card-body p-0">
+                <div class="table-container">
+                    <table class="table is-striped is-fullwidth is-hoverable mt-0">
+                        <thead>
+                            <tr>
+                                <th>Incident ID</th>
+                                <th>Report Date</th>
+                                <th>Date Occured</th>
+                                <th>Time Occured</th>
+                                <th>Crime Code</th>
+                                <th>Weapon Code</th>
+                                <th>Premise Code</th>
+                                <th>Address</th>
+                                <th>Street</th>
+                                <th>Status Code</th>
+                                <th>Victim Id</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data[0] %}
+                            <tr>
+                                <td>{{ row[0] }}</td>
+                                <td>{{ row[1] }}</td>
+                                <td>{{ row[2] }}</td>
+                                <td>{{ row[3] }}</td>
+                                <td>{{ row[4] }}</td>
+                                <td>{{ row[5] }}</td>
+                                <td>{{ row[6] }}</td>
+                                <td>{{ row[7] }}</td>
+                                <td>{{ row[8] }}</td>
+                                <td>{{ row[9] }}</td>
+                                <td>{{ row[10] }}</td>
+                                <td>
+                                    <div class="field has-addons">
+                                        <p class="control">
+                                            <input class="button is-link" type="submit" onclick="openModalIncident('{{ row[0] }}', '{{ row[1] }}', '{{ row[2] }}', '{{ row[4] }}', '{{ row[5] }}', '{{ row[6] }}', '{{ row[9] }}', '{{ row[10] }}')" value="Edit">
+                                        </p>
+                                        <p class="control">
+                                            <input class="button is-danger" type="submit" onclick="openModalDelete('{{ row[0] }}')" value="Delete">
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- The Modal -->
+                <div class="modal" id="updateModalIncident">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title">Update Record</p>
+                            <button class="delete" aria-label="close" onclick="closeModalIncident()"></button>
+                        </header>
+                        <section class="modal-card-body">
+                            <!-- Content ... Form for updating a record -->
+                            <form action="/updateIncident" method="post">
+                                <div class="field">
+                                    <label class="label">Incident ID</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="IncidentID" placeholder="Enter Name" readonly>
+                                    </div>
+                                </div>
+                            
+                                <div class="field">
+                                    <label class="label">Report Date</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="ReportDate" placeholder="Enter Price">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Date Occured</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="DateOccured" placeholder="Enter Price">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Crime Code</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="CrimeCode" placeholder="Enter Price">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Weapon Code</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="WeaponCode" placeholder="Enter Price">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Premise Code</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="PremiseCode" placeholder="Enter Price">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Status Code</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="StatusCode" placeholder="Enter Price">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Victim ID</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="VictimID" placeholder="Enter Price">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="button is-success" type="submit" value="Save Changes">
+                                    </div>
+                                </div>
+                            </form>
+                        </section>
+                    </div>
+                </div>
+                <div class="modal" id="deleteModalIncident">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title">Delete Record</p>
+                            <button class="delete" aria-label="close" onclick="closeModalDelete()"></button>
+                        </header>
+                        <section class="modal-card-body">
+                            <form action="/deleteIncident" method="post">
+                                <div>
+                                    Are you sure, you want to delete this record?
+                                </div>
+                                <div class="field">
+                                    <label class="label">Incident ID</label>
+                                    <div class="control">
+                                        <input class="input" type="text" name="IncidentID" placeholder="Enter Name" readonly>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="button is-success" type="submit" value="Confirm Delete">
+                                    </div>
+                                </div>
+                            </form>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openModalIncident(IncidentID, ReportDate, DateOccured, CrimeCode, WeaponCode, PremiseCode, StatusCode, VictimID) {
+            document.querySelector('#updateModalIncident input[name="IncidentID"]').value = IncidentID;
+            document.querySelector('#updateModalIncident input[name="ReportDate"]').value = ReportDate;
+            document.querySelector('#updateModalIncident input[name="DateOccured"]').value = DateOccured;
+            document.querySelector('#updateModalIncident input[name="CrimeCode"]').value = CrimeCode;
+            document.querySelector('#updateModalIncident input[name="WeaponCode"]').value = WeaponCode;
+            document.querySelector('#updateModalIncident input[name="PremiseCode"]').value = PremiseCode;
+            document.querySelector('#updateModalIncident input[name="StatusCode"]').value = StatusCode;
+            document.querySelector('#updateModalIncident input[name="VictimID"]').value = VictimID;
+            var modal = document.getElementById('updateModalIncident');
+            modal.classList.add('is-active');
+        }
+
+        function closeModalIncident() {
+            var modal = document.getElementById('updateModalIncident');
+            modal.classList.remove('is-active');
+            
+        }
+        
+        function openModalDelete(IncidentID) {
+            document.querySelector('#deleteModalIncident input[name="IncidentID"]').value = IncidentID;
+            var modal = document.getElementById('deleteModalIncident');
+            modal.classList.add('is-active');
+        }
+
+        function closeModalDelete() {
+            var modal = document.getElementById('deleteModalIncident');
+            modal.classList.remove('is-active');
+            
+        }
+
+    </script>
+</body>

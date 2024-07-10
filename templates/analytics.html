@@ -1,0 +1,183 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Statistics</title>
+    <!-- Include Bootstrap for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<style>
+    .navbar {
+        background-color: #333;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+    }
+
+    .navbar a {
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    .navbar a.logo {
+
+        display: block;
+        color: #f2f2f2;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 20px;
+        margin-right: 30px;
+        padding: 14px 16px;
+    }
+
+    .navbar a:hover {
+        background-color: #ddd;
+        color: black;
+    }
+
+    .wleft {
+        text-transform: lowercase;
+        width: 15%;
+    }
+
+    .wright {
+        width: 5%;
+    }
+
+    .wmid {
+        width: 80%;
+    }
+    .card-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .chart-container {
+        display: flex;
+        justify-content: center;
+        height: 50vh;
+        width: 80vw;
+    }
+    .center-chart {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="/home" class="logo">Crime Record Management</a>
+        <div class="nav-links">
+            <a href="/home" class="tablinks">Home</a>
+            <a href="/records/incident" class="tablinks">Records</a>
+            <a href="/search" class="tablinks">Search</a>
+            <a href="/report" class="tablinks">Report Crime</a>
+            <a href="/analytics" class="tablinks">Analytics</a>
+        </div>
+    </div>
+    <div class="container mt-5">
+        <h1 class="mb-4">Analytics on Crime Report History</h1>
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">Record Status Analysis</h5>
+                <div class="center-chart">
+                    <div class="chart-container">
+                        <canvas id="crimeStatsPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">Crime Statistics</h5>
+                {% for stat in stats[0] %}
+                <div class="stat-item mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="mr-2 wleft"><i>{{ stat.crime_code }}</i></div>
+                        <div class="progress wmid mr-2 mb-0" style="height: 20px;">
+                            <div class="progress-bar" role="progressbar"
+                                style="width: calc(100% * {{ stat.value }}/ 600);" aria-valuenow="{{ stat.value }}"
+                                aria-valuemin="0" aria-valuemax="100">{{ stat.value }}</div>
+                        </div>
+                        <div class="wright">{{ stat.value }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+</body>
+<script>
+    var ctx = document.getElementById('crimeStatsPieChart').getContext('2d');
+    var crimeStatsPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ labels | safe }},
+            datasets: [{
+                label: 'Crime Statistics',
+                data: {{ values | safe }},
+                backgroundColor: [
+                    'rgba(255, 218, 185, 0.8)',
+                    'rgba(173, 216, 230, 0.8)',
+                    'rgba(240, 128, 128, 0.8)',
+                    'rgba(189, 252, 201, 0.8)',
+                    'rgba(230, 230, 250, 0.8)',
+                    'rgba(255, 165, 0, 0.8)' // Additional color for extra data
+                ],
+                borderColor: [
+                    'rgb(255, 140, 0)',
+                    'rgb(25, 25, 112)',
+                    'rgb(255, 69, 0)',
+                    'rgb(34, 139, 34)',
+                    'rgb(142, 69, 133)',
+                    'rgb(255, 69, 0)' // Additional border color for extra data
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        },
+                        padding: 20
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Crime Statistics',
+                    font: {
+                        size: 18
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 16
+                    },
+                    bodyFont: {
+                        size: 14
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
+</script>
+</html>
